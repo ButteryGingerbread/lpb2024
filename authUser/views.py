@@ -1,11 +1,11 @@
 from django.shortcuts import render
-from .forms import Login, Register
+from .forms import Login, RegisterForm
 from datetime import datetime
 from django.http import JsonResponse
 from .models import UserProfile
 from django.db.transaction import TransactionManagementError
 from django.core.exceptions import ObjectDoesNotExist
-from django.db import IntegrityError
+from django.db import IntegrityError, transaction
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import get_user_model
@@ -14,34 +14,43 @@ import json
 import bcrypt
 
 # Create your views here.
-@csrf_exempt 
+@csrf_exempt
 def register(request):
-    # check if the request method is POST, IF NOT RETURN ERROR
     if request.method == "POST":
         jsonBody = json.loads(request.body)
-        form = Register(jsonBody)
-        # check if the form is valid, IF NOT RETURN ERROR
+        form = RegisterForm(jsonBody)
+        
         if form.is_valid():
-            userProfile = UserProfile()
-            birth_date = jsonBody['birth_date']
-            # convert birth date to date time
+            birth_date = jsonBody.get('birth_date')
+            gender = jsonBody.get('gender')
+            condition = jsonBody.get('condition')
+            
             try:
                 dateTime = datetime.strptime(birth_date, '%d-%m-%Y')
-                # store extra data here
-                userProfile.birth_date = dateTime
             except ValueError:
-                return JsonResponse({'status':'false','message':"not valid date time"}, status=500)
-            
-            user = User.objects.create_user(jsonBody['username'], jsonBody['email'], jsonBody['password'])
+                return JsonResponse({'status': 'false', 'message': "Invalid date format. Use dd-mm-yyyy."}, status=500)
+
             try:
-                user.save()
-                userProfile.user_id = user.id
-                userProfile.save()
-                return JsonResponse({'status':'true','message':"user registered"}, status=200)
-            except (TransactionManagementError, IntegrityError) as e:
-                return JsonResponse({'status': 'false', 'message': str(e.__cause__)}, status = 500)
-        return JsonResponse({'status':'false','message':"form not valid"}, status=500)
-    return JsonResponse({'status':'false','message':"request method not valid"}, status=500)
+                with transaction.atomic():
+                    user = form.save(commit=False)
+                    user.set_password(jsonBody['password1'])
+                    user.save()
+                    
+                    userProfile = UserProfile.objects.create(
+                        user_id=user.id,
+                        birth_date=dateTime,
+                        gender=gender,
+                        condition=condition
+                    )
+
+                return JsonResponse({'status': 'true', 'message': "User registered successfully."}, status=200)
+            except IntegrityError as e:
+                return JsonResponse({'status': 'false', 'message': str(e)}, status=500)
+
+        errors = form.errors.as_json()
+        return JsonResponse({'status': 'false', 'message': "Form is not valid.", 'errors': errors}, status=500)
+
+    return JsonResponse({'status': 'false', 'message': "Only POST method is allowed."}, status=500)
 
 @csrf_exempt 
 def login_view(request):

@@ -4,6 +4,8 @@ from django.contrib.auth.forms import UserCreationForm
 
 class Register(UserCreationForm):
     birth_date = forms.CharField(max_length=50)
+    gender = forms.CharField(max_length=6)
+    condition = forms.CharField(max_length=11)
     class Meta:
         model=User
         fields = ['username','email','password'] 
@@ -20,6 +22,8 @@ class LoginForm(forms.Form):
 
 class RegisterForm(UserCreationForm):
     birth_date = forms.CharField(max_length=50)
+    gender = forms.CharField(max_length=6)
+    condition = forms.CharField(max_length=11)
     class Meta:
         model=User
         fields = ['username','email','password1','password2'] 
