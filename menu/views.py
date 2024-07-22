@@ -1,5 +1,5 @@
 from django.shortcuts import render
-# from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from .models import Menu
@@ -7,6 +7,7 @@ import json
 
 # Create your views here.
 
+#@login_required
 @csrf_exempt
 def display_all(request):
     if request.method == 'GET':
@@ -14,6 +15,7 @@ def display_all(request):
         return JsonResponse([menu.serialize() for menu in menus], safe=False)
     return JsonResponse({'status':'false','message':"request method not valid"}, status=500)
 
+#@login_required
 @csrf_exempt
 def display_by_category(request, menu_category):
     if request.method == 'GET':

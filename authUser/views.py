@@ -52,26 +52,33 @@ def register(request):
 
     return JsonResponse({'status': 'false', 'message': "Only POST method is allowed."}, status=500)
 
-@csrf_exempt 
+@csrf_exempt
 def login_view(request):
     if request.method == 'POST':
-        jsonBody = json.loads(request.body)
+        try:
+            jsonBody = json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse({'status': 'false', 'message': "invalid JSON"}, status=400)
+        
         form = Login(jsonBody)
         UserModel = get_user_model()
-        # check if the form is valid, IF NOT RETURN ERROR
+        
         if form.is_valid():
-            email = jsonBody['email']
-            passwordText = jsonBody['password']
+            email = form.cleaned_data['email']
+            passwordText = form.cleaned_data['password']
+            
             try:
                 user = UserModel.objects.get(email=email)
-            except ObjectDoesNotExist as e:
-                return JsonResponse({'status': 'false', 'message': "user name or password invalid"}, status = 500)
+            except UserModel.DoesNotExist:
+                return JsonResponse({'status': 'false', 'message': "user name or password invalid"}, status=400)
             
-            userLogin = authenticate(username=user.__dict__['username'], password=jsonBody['password'])
-            if user is not None:
+            userLogin = authenticate(username=user.username, password=passwordText)
+            if userLogin is not None:
                 return JsonResponse({'status':'true','message':"login success"}, status=200)
             
-            return JsonResponse({'status': 'false', 'message': "failed login"}, status = 500)
-        return JsonResponse({'status':'false','message':"form not valid"}, status=500)
-    return JsonResponse({'status':'false','message':"request method not valid"}, status=500)
+            return JsonResponse({'status': 'false', 'message': "user name or password invalid"}, status=400)
+        
+        return JsonResponse({'status':'false','message':"form not valid"}, status=400)
+    
+    return JsonResponse({'status':'false','message':"request method not valid"}, status=400)
     

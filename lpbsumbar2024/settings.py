@@ -131,3 +131,11 @@ STATIC_URL = '/static/'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+SECURE_SSL_REDIRECT = False  # Allow both HTTP and HTTPS
+CSRF_COOKIE_SECURE = False   # Allow CSRF cookies over HTTP
+SESSION_COOKIE_SECURE = False  # Allow session cookies over HTTP
+
+ALLOWED_HOSTS = ['127.0.0.1', '192.168.1.10']
+
+LOGIN_URL = '/user/login/'
