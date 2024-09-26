@@ -1,7 +1,12 @@
 from django.db import models
-from .utils import encode_image, decode_image
 
-# Create your models here.
+class Customer(models.Model):
+    name = models.CharField(db_column='Name', max_length=255)  # Field name made lowercase.
+    condition = models.CharField(max_length=255)
+
+    class Meta:
+        managed = False
+        db_table = 'customer'
 
 class Menu(models.Model):
     menu_name = models.CharField(max_length=256, blank=True, null=True)
@@ -23,11 +28,3 @@ class Menu(models.Model):
             "menu_category": self.menu_category,
             "menu_image": self.menu_image
         }
-    
-class Customer(models.Model):
-    name = models.CharField(db_column='Name', max_length=255)  # Field name made lowercase.
-    condition = models.CharField(max_length=255)
-
-    class Meta:
-        managed = False
-        db_table = 'customer'

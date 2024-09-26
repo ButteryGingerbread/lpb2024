@@ -18,30 +18,19 @@ import bcrypt
 def register(request):
     if request.method == "POST":
         jsonBody = json.loads(request.body)
-        form = RegisterForm(jsonBody)
-        
-        if form.is_valid():
-            birth_date = jsonBody.get('birth_date')
-            gender = jsonBody.get('gender')
-            condition = jsonBody.get('condition')
-            
-            try:
-                dateTime = datetime.strptime(birth_date, '%d-%m-%Y')
-            except ValueError:
-                return JsonResponse({'status': 'false', 'message': "Invalid date format. Use dd-mm-yyyy."}, status=500)
+        form = RegisterForm({
+            'username': jsonBody.get('username'),
+            'email': jsonBody.get('email'),
+            'password1': jsonBody.get('password1'),
+            'password2': jsonBody.get('password2')
+        })
 
+        if form.is_valid():
             try:
                 with transaction.atomic():
                     user = form.save(commit=False)
                     user.set_password(jsonBody['password1'])
                     user.save()
-                    
-                    userProfile = UserProfile.objects.create(
-                        user_id=user.id,
-                        birth_date=dateTime,
-                        gender=gender,
-                        condition=condition
-                    )
 
                 return JsonResponse({'status': 'true', 'message': "User registered successfully."}, status=200)
             except IntegrityError as e:
@@ -51,6 +40,7 @@ def register(request):
         return JsonResponse({'status': 'false', 'message': "Form is not valid.", 'errors': errors}, status=500)
 
     return JsonResponse({'status': 'false', 'message': "Only POST method is allowed."}, status=500)
+
 
 @csrf_exempt
 def login_view(request):

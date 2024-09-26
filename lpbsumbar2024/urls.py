@@ -20,5 +20,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('user/', include("authUser.urls")),
     path('menu/', include("menu.urls")),
-    # path('predict/', include("predict.urls"))
+    path('customer/', include("customer.urls")),
+    path('ingredients/', include("ProcessIngredients.urls"))
 ]

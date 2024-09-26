@@ -40,7 +40,9 @@ INSTALLED_APPS = [
     'rest_framework',
     'lpbsumbar2024',
     'authUser.apps.AuthConfig',
-    'menu.apps.MenuConfig'
+    'menu.apps.MenuConfig',
+    'customer.apps.CustomerConfig',
+    'ProcessIngredients.apps.ProcessingredientsConfig'
 ]
 
 MIDDLEWARE = [
@@ -132,10 +134,10 @@ STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-SECURE_SSL_REDIRECT = False  # Allow both HTTP and HTTPS
-CSRF_COOKIE_SECURE = False   # Allow CSRF cookies over HTTP
-SESSION_COOKIE_SECURE = False  # Allow session cookies over HTTP
+SECURE_SSL_REDIRECT = False
+CSRF_COOKIE_SECURE = False
+SESSION_COOKIE_SECURE = False
 
-ALLOWED_HOSTS = ['127.0.0.1', '192.168.1.10']
+ALLOWED_HOSTS = ['127.0.0.1', '192.168.1.15']
 
 LOGIN_URL = '/user/login/'

@@ -1,0 +1,25 @@
+import tensorflow as tf
+
+# Load the TensorFlow Lite model
+model_path = 'path/to/your/model.tflite'
+interpreter = tf.lite.Interpreter(model_path=model_path)
+
+# Allocate tensors
+interpreter.allocate_tensors()
+
+# Get input and output tensor details
+input_details = interpreter.get_input_details()
+output_details = interpreter.get_output_details()
+
+# Print details
+print("Input Details:")
+for detail in input_details:
+    print(f"Name: {detail['name']}")
+    print(f"Shape: {detail['shape']}")
+    print(f"Datatype: {detail['dtype']}")
+
+print("\nOutput Details:")
+for detail in output_details:
+    print(f"Name: {detail['name']}")
+    print(f"Shape: {detail['shape']}")
+    print(f"Datatype: {detail['dtype']}")
